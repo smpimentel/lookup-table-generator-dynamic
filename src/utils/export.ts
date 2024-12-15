@@ -1,5 +1,5 @@
 import { Parameter } from '../types/parameter';
-import { generateCombinations } from './combinations';
+import { generateCombinations } from './combinationUtils';
 
 export const generateCSV = (parameters: Parameter[]): string => {
   const headers = ['Description', ...parameters.map(p => `${p.name}##${p.type}##${p.unit}`)];

@@ -10,6 +10,13 @@ export interface Parameter {
   description?: string;
 }
 
+export interface ParameterSet {
+  id: string;
+  name: string;
+  parameters: Parameter[];
+  created: Date;
+}
+
 export interface UnitOption {
   value: RevitParameterUnit;
   label: string;

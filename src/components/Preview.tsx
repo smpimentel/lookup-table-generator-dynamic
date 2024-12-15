@@ -1,28 +1,12 @@
 import React from 'react';
 import { useParameterStore } from '../store/parameterStore';
 import { useMappingStore } from '../store/mappingStore';
-import { generateCombinations, combineWithImported } from '../utils/parameterUtils';
 
 export const Preview: React.FC = () => {
-  const { parameters, importedRows } = useParameterStore();
+  const { parameters, combinations, importedRows } = useParameterStore();
   const { mappings } = useMappingStore();
 
   if (!parameters.length) return null;
-
-  const importedCount = importedRows?.[0]?.length || 0;
-  const newParameters = parameters.slice(importedCount);
-  
-  let combinations = combineWithImported(importedRows, newParameters);
-  
-  if (!combinations?.length) {
-    return (
-      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-        <p className="text-red-600">
-          No combinations available. Add values to your parameters.
-        </p>
-      </div>
-    );
-  }
 
   // Create parameter index mapping for validation
   const parameterIndexes = Object.fromEntries(
@@ -30,7 +14,7 @@ export const Preview: React.FC = () => {
   );
 
   // Filter combinations based on mapping rules
-  combinations = combinations.filter(combination => 
+  const filteredCombinations = combinations?.filter(combination => 
     mappings.every(mapping => {
       if (!mapping.applied) return true;
 
@@ -56,7 +40,17 @@ export const Preview: React.FC = () => {
         return consequence.operator === 'equals' ? isEqual : !isEqual;
       });
     })
-  );
+  ) || [];
+
+  if (!filteredCombinations.length) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-600">
+          No combinations available. Add values to your parameters.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -77,7 +71,7 @@ export const Preview: React.FC = () => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {combinations.map((combination, index) => (
+          {filteredCombinations.map((combination, index) => (
             <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
               <td className="px-4 py-2 text-sm text-gray-900 whitespace-nowrap">
                 Row_{index + 1}
