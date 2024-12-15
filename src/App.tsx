@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Upload, Save } from 'lucide-react';
+import { Download, FolderDown, Save } from 'lucide-react';
 import { ParameterForm } from './components/ParameterForm';
 import { ParameterList } from './components/ParameterList';
 import { MappingRules } from './components/MappingRules';
@@ -79,7 +79,7 @@ function App() {
               onClick={() => document.getElementById('importInput')?.click()}
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
             >
-              <Upload size={20} />
+              <FolderDown size={20} />
               Import
             </button>
             <button
