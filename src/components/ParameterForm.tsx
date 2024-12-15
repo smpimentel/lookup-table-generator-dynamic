@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SquarePlus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useParameterStore } from '../store/parameterStore';
 import { RevitParameterType, RevitParameterUnit, PARAMETER_TYPES } from '../types/parameter';
 
@@ -71,7 +71,7 @@ export const ParameterForm: React.FC = () => {
         type="submit"
         className="flex items-center justify-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 md:col-span-2"
       >
-        <SquarePlus size={20} />
+        <Plus size={20} />
         Add Parameter
       </button>
     </form>
