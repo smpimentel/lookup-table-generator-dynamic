@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, FolderDown, Save } from 'lucide-react';
+import { Download, Upload, Save } from 'lucide-react';
 import { ParameterForm } from './components/ParameterForm';
 import { ParameterList } from './components/ParameterList';
 import { MappingRules } from './components/MappingRules';
@@ -7,15 +7,29 @@ import { Preview } from './components/Preview';
 import { useParameterStore } from './store/parameterStore';
 import { useMappingStore } from './store/mappingStore';
 import { FileImporter } from './utils/FileImporter';
-import { formatCSV } from './utils/parameterUtils';
+import { formatCSV } from './utils/parameterUtils'; // Re-add this import
 import { downloadFile } from './utils/fileUtils';
 import { Notification } from './components/Notification';
 
+/**
+ * Main application component that handles:
+ * - Parameter management
+ * - File import/export
+ * - Mapping rules
+ * - Preview generation
+ */
 function App() {
+  // State for handling import errors
   const [importError, setImportError] = useState<string | null>(null);
+  
+  // Global state hooks
   const { parameters, loadParameters } = useParameterStore();
   const { loadMappings } = useMappingStore();
 
+  /**
+   * Handles file import for both JSON and CSV files
+   * Updates global state with imported data
+   */
   const handleImport = async (file: File) => {
     try {
       const { parameters: importedParams, mappings, rows } = await FileImporter.import(file);
@@ -29,6 +43,10 @@ function App() {
     }
   };
 
+  /**
+   * Saves current configuration as JSON file
+   * Includes parameters, mappings, and metadata
+   */
   const handleSave = () => {
     const configuration = {
       parameters,
@@ -44,6 +62,9 @@ function App() {
     );
   };
 
+  /**
+   * Exports current parameter combinations as CSV
+   */
   const handleDownload = () => {
     if (parameters.length === 0) return;
     
@@ -58,6 +79,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
+        {/* Header Section */}
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
@@ -79,7 +101,7 @@ function App() {
               onClick={() => document.getElementById('importInput')?.click()}
               className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2"
             >
-              <FolderDown size={20} />
+              <Upload size={20} />
               Import
             </button>
             <button
@@ -92,18 +114,22 @@ function App() {
           </div>
         </div>
 
+        {/* Parameter Form Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <ParameterForm />
         </div>
 
+        {/* Parameter List Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <ParameterList />
         </div>
 
+        {/* Mapping Rules Section */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <MappingRules />
         </div>
 
+        {/* Preview Section */}
         {parameters.length > 0 && (
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
@@ -120,6 +146,7 @@ function App() {
           </div>
         )}
 
+        {/* Error Notification */}
         <Notification
           show={!!importError}
           message={importError || ''}

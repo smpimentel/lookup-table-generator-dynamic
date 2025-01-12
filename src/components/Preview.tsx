@@ -3,17 +3,15 @@ import { useParameterStore } from '../store/parameterStore';
 import { useMappingStore } from '../store/mappingStore';
 
 export const Preview: React.FC = () => {
-  const { parameters, combinations, importedRows } = useParameterStore();
+  const { parameters, combinations } = useParameterStore();
   const { mappings } = useMappingStore();
 
   if (!parameters.length) return null;
 
-  // Create parameter index mapping for validation
   const parameterIndexes = Object.fromEntries(
     parameters.map((param, index) => [param.id, index])
   );
 
-  // Filter combinations based on mapping rules
   const filteredCombinations = combinations?.filter(combination => 
     mappings.every(mapping => {
       if (!mapping.applied) return true;

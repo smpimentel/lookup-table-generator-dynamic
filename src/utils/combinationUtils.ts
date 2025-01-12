@@ -2,29 +2,46 @@ import { Parameter } from '../types/parameter';
 
 /**
  * Generates all possible combinations from arrays of values
+ * @param arrays Array of string arrays to combine
+ * @returns Array of all possible combinations
  */
 export const generateCombinations = (arrays: string[][]): string[][] => {
+  // Handle edge cases
   if (!arrays?.length) return [];
   if (arrays.some(arr => !Array.isArray(arr) || !arr.length)) return [];
-  
-  const [first, ...rest] = arrays;
-  const restCombinations = generateCombinations(rest);
-  
-  if (restCombinations.length === 0) {
-    return first.map(value => [value]);
+
+  // Base case: single array
+  if (arrays.length === 1) {
+    return arrays[0].map(value => [value]);
   }
-  
-  return first.reduce((acc, x) => [...acc, ...restCombinations.map(c => [x, ...c])], []);
+
+  // Recursive combination generation
+  const result: string[][] = [];
+  const [currentArray, ...remainingArrays] = arrays;
+  const subCombinations = generateCombinations(remainingArrays);
+
+  for (const value of currentArray) {
+    for (const subCombo of subCombinations) {
+      result.push([value, ...subCombo]);
+    }
+  }
+
+  return result;
 };
 
 /**
- * Updates existing combinations when new parameter values are added
+ * Updates existing combinations when parameter values change
+ * @param existingCombinations Current combinations
+ * @param parameters All parameters
+ * @param updatedParameterIndex Index of the modified parameter
+ * @returns Updated combinations array
  */
 export const updateParameterCombinations = (
   existingCombinations: string[][] | null,
   parameters: Parameter[],
   updatedParameterIndex: number
 ): string[][] => {
+  // Generate new combinations if none exist
   if (!existingCombinations?.length) {
     return generateCombinations(parameters.map(p => p.values));
   }
@@ -34,21 +51,17 @@ export const updateParameterCombinations = (
     existingCombinations.map(combo => combo[updatedParameterIndex])
   );
 
-  // Find new values that weren't in existing combinations
   const newValues = updatedValues.filter(value => !existingValues.has(value));
-
   if (!newValues.length) {
     return existingCombinations;
   }
 
-  // Generate combinations for other parameters
   const otherParameterValues = parameters
     .map(p => p.values)
     .filter((_, index) => index !== updatedParameterIndex);
 
   const otherCombinations = generateCombinations(otherParameterValues);
 
-  // Generate new combinations with new values
   const newCombinations = newValues.flatMap(newValue => 
     otherCombinations.map(combo => {
       const result = [...combo];
@@ -62,6 +75,9 @@ export const updateParameterCombinations = (
 
 /**
  * Combines imported rows with new parameter combinations
+ * @param existingRows Previously imported rows
+ * @param newParameters New parameters to combine
+ * @returns Combined array of all combinations
  */
 export const combineWithImported = (
   existingRows: string[][],
@@ -75,8 +91,9 @@ export const combineWithImported = (
     return existingRows;
   }
 
-  const newCombinations = generateCombinations(newParameters.map(p => p.values));
-  
+  const newValues = newParameters.map(p => p.values);
+  const newCombinations = generateCombinations(newValues);
+
   return existingRows.flatMap(existingRow =>
     newCombinations.map(newCombo => [...existingRow, ...newCombo])
   );

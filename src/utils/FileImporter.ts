@@ -53,7 +53,6 @@ export class FileImporter {
     const parameters = this.createParametersFromHeaders(headers.slice(1));
     const rows = lines.slice(1).map(line => this.parseCSVLine(line).slice(1));
     
-    // Extract unique values for each parameter
     rows.forEach(row => {
       row.forEach((value, index) => {
         if (value && !parameters[index].values.includes(value)) {
